@@ -120,7 +120,28 @@ class BookApiTest extends TestCase
 
         $this->putJson("/api/books/{$book->id}", ['title' => '', 'author' => ''])
             ->assertUnprocessable()
-            ->assertJsonValidationErrors(['title', 'author', 'genre', 'year_published']);
+            ->assertJsonValidationErrors(['title', 'author']);
+    }
+
+    #[Test]
+    public function it_partially_updates_a_book_with_patch(): void
+    {
+        $book = Book::factory()->create(['genre' => 'Fiction']);
+
+        $this->patchJson("/api/books/{$book->id}", ['genre' => 'Classic'])
+            ->assertOk()
+            ->assertJsonPath('data.genre', 'Classic')
+            ->assertJsonPath('data.title', $book->title);
+    }
+
+    #[Test]
+    public function the_versioned_v1_endpoints_work(): void
+    {
+        $book = Book::factory()->create();
+
+        $this->getJson('/api/v1/books')->assertOk()->assertJsonCount(1);
+        $this->getJson("/api/v1/books/{$book->id}")->assertOk()->assertJsonPath('id', $book->id);
+        $this->getJson('/api/v1/books/99999')->assertNotFound()->assertJsonPath('message', 'Book not found.');
     }
 
     #[Test]

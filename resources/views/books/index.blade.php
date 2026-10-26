@@ -1,67 +1,11 @@
 @extends('layouts.app')
-
-@section('title', 'Book List')
-
+@section('title', 'Books')
+@section('page', 'books-index')
 @section('content')
-    <div class="card">
-        <h1>Book List</h1>
-
-        <div class="toolbar">
-            <form class="search" method="GET" action="{{ route('books.index') }}">
-                <input type="text" name="search" value="{{ $search }}" placeholder="Search by title or author">
-                <button type="submit" class="btn btn-secondary">Search</button>
-                @if ($search)
-                    <a href="{{ route('books.index') }}" class="btn btn-secondary">Clear</a>
-                @endif
-            </form>
-            <a href="{{ route('books.create') }}" class="btn">+ Add Book</a>
-        </div>
-
-        <div class="table-wrap">
-            <table>
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Title</th>
-                        <th>Author</th>
-                        <th>Genre</th>
-                        <th>Year Published</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @forelse ($books as $book)
-                        <tr>
-                            <td>{{ $book->id }}</td>
-                            <td>{{ $book->title }}</td>
-                            <td>{{ $book->author }}</td>
-                            <td>{{ $book->genre }}</td>
-                            <td>{{ $book->year_published }}</td>
-                            <td class="actions">
-                                <a href="{{ route('books.edit', $book) }}" class="btn btn-secondary btn-sm">Edit</a>
-                                <form method="POST" action="{{ route('books.destroy', $book) }}"
-                                      onsubmit="return confirm('Delete this book permanently?');">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="btn btn-danger btn-sm">Delete</button>
-                                </form>
-                            </td>
-                        </tr>
-                    @empty
-                        <tr>
-                            <td colspan="6" class="empty">
-                                @if ($search)
-                                    No books match "{{ $search }}".
-                                @else
-                                    No books yet. Add your first book!
-                                @endif
-                            </td>
-                        </tr>
-                    @endforelse
-                </tbody>
-            </table>
-        </div>
-
-        <div class="pagination">{{ $books->links('pagination::simple-bootstrap-4') }}</div>
-    </div>
+<div class="page-header"><div><p class="eyebrow">BOOK MANAGEMENT</p><h1>Book List</h1><p>Search, view, edit, or remove books in the collection.</p></div><a class="btn" href="{{ route('books.create') }}">+ Add Book</a></div>
+<div id="bookNotice" class="notice" role="status" hidden></div>
+<section class="glass-card table-card"><div class="section-heading"><h2>Saved Books</h2><button type="button" class="btn btn-secondary" id="refreshBooks">Refresh</button></div>
+<form id="searchForm" class="search-bar" role="search"><input id="search" name="search" type="search" placeholder="Search by title or author"><button type="submit">Search</button><button type="button" class="btn btn-secondary" id="clearSearch">Clear</button></form>
+<div class="table-responsive"><table><thead><tr><th>ID</th><th>Title</th><th>Author</th><th>Genre</th><th>Year</th><th>Actions</th></tr></thead>
+<tbody id="bookTableBody"><tr><td colspan="6" class="empty-state">Loading books...</td></tr></tbody></table></div></section>
 @endsection

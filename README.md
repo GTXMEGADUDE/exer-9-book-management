@@ -1,18 +1,18 @@
 # Book Management System
 
-A Laravel 13 application (run with Laragon) for managing a digital book collection: create, read, update, delete, and search books. It has a JSON REST API (tested with Postman) and a simple web interface.
+A Laravel 13 application (run with Laragon) for managing a digital book collection: create, read, update, delete, and search books. It follows the structure of the *Laravel Project – CRUD, API Versioning, Email SMTP* guide: a versioned API resource controller (`App\Http\Controllers\Api\V1\BookController`), `Route::view` front-end pages, and `public/js/app.js` calling the API with `fetch`.
 
 ## Features
 
 | Feature | Where |
 | --- | --- |
-| Add Book Record | `POST /api/books`, web: **+ Add Book** |
-| View Book List | `GET /api/books`, web: `/books` table |
-| Edit Book Record | `PUT /api/books/{id}`, web: **Edit** |
-| Delete Book Record | `DELETE /api/books/{id}`, web: **Delete** |
-| Search Function | `GET /api/books?search=...` (title or author, partial match), web: search box |
-| Validation | `App\Http\Requests\BookRequest`: all fields required, year must be a 4-digit year not in the future |
-| Notifications | API responses include a `message`; the web UI shows a green success banner |
+| Add Book Record | `POST /api/books`, web: `/books/create` |
+| View Book List | `GET /api/books`, web: `/books` table, `/books/{id}` details |
+| Edit Book Record | `PUT`/`PATCH /api/books/{id}`, web: `/books/{id}/edit` |
+| Delete Book Record | `DELETE /api/books/{id}`, web: **Delete** buttons |
+| Search Function | `GET /api/books?search=...` (title or author, partial match), web: search bar |
+| Validation | `$request->validate()` in the controller: all fields required, year must be 1000 to the current year |
+| Notifications | API responses include a `message`; the web pages show it as a success notice |
 
 ## Setup (Laragon)
 
@@ -26,7 +26,7 @@ A Laravel 13 application (run with Laragon) for managing a digital book collecti
    php artisan key:generate
    ```
 
-   Set the database in `.env`:
+   Set the database in `.env`, then run `php artisan config:clear`:
 
    ```
    DB_CONNECTION=mysql
@@ -50,9 +50,11 @@ A Laravel 13 application (run with Laragon) for managing a digital book collecti
    ```
 
    - Web UI: http://127.0.0.1:8001/books
-   - API: http://127.0.0.1:8001/api/books
+   - API: http://127.0.0.1:8001/api/books (or http://127.0.0.1:8001/api/v1/books)
 
 ## API
+
+The API is versioned under `/api/v1/books` (see `routes/api.php`). The same controller is also registered at `/api/books`, which is the address used in the lab test cases.
 
 | Method | Endpoint | Success | Errors |
 | --- | --- | --- | --- |
@@ -61,6 +63,7 @@ A Laravel 13 application (run with Laragon) for managing a digital book collecti
 | POST | `/api/books` | 201, `{ "message": "Book created successfully.", "data": {...} }` | 422 |
 | GET | `/api/books/{id}` | 200, book object | 404 |
 | PUT | `/api/books/{id}` | 200, `{ "message": "Book updated successfully.", "data": {...} }` | 422, 404 |
+| PATCH | `/api/books/{id}` | 200, updates only the fields sent | 422, 404 |
 | DELETE | `/api/books/{id}` | 200, `{ "message": "Book deleted successfully." }` | 404 |
 
 Request body (JSON):
@@ -73,6 +76,19 @@ Request body (JSON):
     "year_published": 1925
 }
 ```
+
+A missing book returns `404` with `{ "message": "Book not found." }`.
+
+## Front-End
+
+| Page | Route | View |
+| --- | --- | --- |
+| Book list + search | `/books` | `resources/views/books/index.blade.php` |
+| Add book | `/books/create` | `resources/views/books/create.blade.php` |
+| Book details | `/books/{id}` | `resources/views/books/show.blade.php` |
+| Edit book | `/books/{id}/edit` | `resources/views/books/edit.blade.php` |
+
+The pages call the API from `public/js/app.js` and are styled by `public/css/app.css`.
 
 ## Postman Test Cases
 
