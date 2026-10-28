@@ -89,18 +89,3 @@ A missing book returns `404` with `{ "message": "Book not found." }`.
 | Edit book | `/books/{id}/edit` | `resources/views/books/edit.blade.php` |
 
 The pages call the API from `public/js/app.js` and are styled by `public/css/app.css`.
-
-## Postman Test Cases
-
-Import `postman/Book-Management-System.postman_collection.json` into Postman. It contains requests TC01-TC21, each with a status-code check. The `baseUrl` collection variable defaults to `http://127.0.0.1:8001`.
-
-- Run `php artisan migrate:fresh --seed` before TC01 so book IDs match.
-- TC12 deletes book 1, so run `php artisan migrate:fresh --seed` again before TC19-TC21.
-
-## Automated Tests
-
-```sh
-php artisan test
-```
-
-Feature tests in `tests/Feature/BookApiTest.php` and `tests/Feature/BookWebTest.php` cover every test case.
